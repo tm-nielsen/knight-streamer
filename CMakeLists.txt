@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(SUBMODULE_PATH ${CMAKE_SOURCE_DIR}/thirdparty)
 
 
-add_executable(knight_pipe
+add_executable(${PROJECT_NAME}
     src/main.cpp
     src/arguments.cpp
     src/utils/print_helpers.cpp
@@ -16,17 +16,17 @@ add_executable(knight_pipe
     src/neuropawn/knight.cpp
     src/neuropawn/knight_imu.cpp
 )
-target_compile_options(knight_pipe PRIVATE /W4 /WX)
-target_precompile_headers(knight_pipe PRIVATE include/pch.hpp)
-target_include_directories(knight_pipe PRIVATE include)
+target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX)
+target_precompile_headers(${PROJECT_NAME} PRIVATE include/pch.hpp)
+target_include_directories(${PROJECT_NAME} PRIVATE include)
 
 
-add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/liblsl)
-target_link_libraries(knight_pipe LINK_PUBLIC lsl)
+add_subdirectory(${SUBMODULE_PATH}/liblsl)
+target_link_libraries(${PROJECT_NAME} LINK_PUBLIC lsl)
 
-add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/CSerialPort)
-target_link_libraries(knight_pipe LINK_PUBLIC libcserialport)
-target_include_directories(knight_pipe PUBLIC ${CMAKE_SOURCE_DIR}/thirdparty/CSerialPort/include)
+add_subdirectory(${SUBMODULE_PATH}/CSerialPort)
+target_link_libraries(${PROJECT_NAME} LINK_PUBLIC libcserialport)
+target_include_directories(${PROJECT_NAME} PUBLIC ${SUBMODULE_PATH}/CSerialPort/include)
 
 
 function(INCLUDE_SUBMODULE MODULE_NAME)
@@ -34,7 +34,7 @@ function(INCLUDE_SUBMODULE MODULE_NAME)
     target_include_directories(
         ${MODULE_NAME} INTERFACE "${SUBMODULE_PATH}/${MODULE_NAME}/include"
     )
-    target_link_libraries(knight_pipe PRIVATE ${MODULE_NAME})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${MODULE_NAME})
 endfunction()
 
 include_submodule(argparse)
