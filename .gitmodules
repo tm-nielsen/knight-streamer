@@ -1,9 +1,6 @@
 [submodule "thirdparty/liblsl"]
 	path = thirdparty/liblsl
 	url = https://github.com/sccn/liblsl
-[submodule "thirdparty/serial"]
-	path = thirdparty/serial
-	url = https://github.com/wjwwood/serial
 [submodule "thirdparty/argparse"]
 	path = thirdparty/argparse
 	url = https://github.com/p-ranav/argparse
