@@ -19,14 +19,12 @@ CommandLineArguments ParseCommandLineArguments(int argc, char* argv[])
 
     parser.add_argument("-g", "--gain", "--eeg-gain")
         .help("EEG gain multiplier")
-        .choices(1, 2, 3, 4, 6, 8, 12)
         .default_value(12)
         .store_into(arguments.gain);
 
     parser.add_argument("-i", "--imu", "--imu-board", "--use-imu-protocol")
         .help("Interpret data stream using the eeg + imu protocol")
-        .default_value(false).implicit_value(true)
-        .store_into(arguments.useIMUProtocol);
+        .flag().store_into(arguments.useIMUProtocol);
 
 
     parser.add_group("LSL Stream Parameters");
@@ -43,6 +41,11 @@ CommandLineArguments ParseCommandLineArguments(int argc, char* argv[])
     try
     {
         parser.parse_args(argc, argv);
+
+        if (!validGainValues.count(arguments.gain))
+        {
+            throw std::exception("Invalid gain value - allowed options: {1, 2, 3, 4, 6, 8, 12}");
+        }
     }
     catch (const std::exception& err)
     {
