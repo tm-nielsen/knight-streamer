@@ -1,5 +1,6 @@
 # include "interaction/arguments.hpp"
 # include "interaction/port_selection.hpp"
+# include "neuropawn/knight.hpp"
 # include "utils/print_helpers.hpp"
 
 
@@ -13,7 +14,22 @@ int main(int argc, char* argv[])
     }
     const char* port_name = selectPort(arguments.serialPort);
 
-    serial::CSerialPort port(port_name);
-    port.setBaudRate(115200);
-    port.setStopBits(serial::StopBits::StopTwo);
+    serial::CSerialPort port;
+    KnightProtocolParser parser;
+    port.setProtocolParser(&parser);
+
+    port.init(
+        port_name, 115200,
+        serial::ParityNone,
+        serial::DataBits8,
+        serial::StopTwo
+    );
+    if (port.open()) PRINTF("Opened serial port {}.", port_name)
+    else
+    {
+        PRINTERR("Failed to open serial port.")
+        exit(1);
+    }
+
+    for (;;) { sleep(100); }
 }
