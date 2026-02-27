@@ -14,8 +14,8 @@ unsigned int KnightProtocolParser::parse
     unsigned int processedSize = 0;
     const unsigned char *ptr = static_cast<const unsigned char*>(buffer);
 
-    bool startByteFound;
-    unsigned int startByteOffset;
+    bool startByteFound = false;
+    unsigned int startByteOffset = 0;
 
     while (offset < size)
     {

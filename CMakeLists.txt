@@ -14,7 +14,6 @@ add_executable(${PROJECT_NAME}
     src/utils/print_helpers.cpp
     src/interaction/arguments.cpp
     src/interaction/port_selection.cpp
-    src/neuropawn/knight_base.cpp
     src/neuropawn/knight.cpp
     src/neuropawn/knight_imu.cpp
 )
