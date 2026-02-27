@@ -47,22 +47,27 @@ void KnightProtocolParser::onProtocolEvent(ResultVector &results)
 {
     for (const serial::IProtocolResult& result : results)
     {
-        KnightSample sample;
-        sample.counter = result.data[1];
-
-        const unsigned char* exgData = result.data + EXG_DATA_OFFSET;
-        double eegScale = mGain * BASE_EEG_SCALE;
-
-        for (int i = 0; i < CHANNEL_COUNT; i++)
-        {
-            const unsigned char* channelData = exgData + 2 * i;
-            unsigned int channelValue = castTwoByteInteger(channelData);
-            sample.exgChannels[i] = channelValue * eegScale;
-        }
-
-        sample.lOffP = result.data[LOffStatP_DATA_OFFSET];
-        sample.lOffN = result.data[LOffStatN_DATA_OFFSET];
-
+        KnightSample sample = parseSample(result);
         PRINTF("Sample {} received, channel 1 value : {}", sample.counter, sample[0]);
     }
+}
+
+KnightSample KnightProtocolParser::parseSample(serial::IProtocolResult result)
+{
+    KnightSample sample;
+    sample.counter = result.data[1];
+
+    const unsigned char* exgData = result.data + EXG_DATA_OFFSET;
+    double eegScale = mGain * BASE_EEG_SCALE;
+
+    for (int i = 0; i < CHANNEL_COUNT; i++)
+    {
+        const unsigned char* channelData = exgData + 2 * i;
+        unsigned int channelValue = castTwoByteInteger(channelData);
+        sample.exgChannels[i] = channelValue * eegScale;
+    }
+
+    sample.lOffStatP = result.data[LOffStatP_DATA_OFFSET];
+    sample.lOffStatN = result.data[LOffStatN_DATA_OFFSET];
+    return sample;
 }

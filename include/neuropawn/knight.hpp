@@ -10,8 +10,8 @@ struct KnightSample
 {
     uint8_t counter;
     double exgChannels[8];
-    double lOffP;
-    double lOffN;
+    double lOffStatP;
+    double lOffStatN;
 
     double& operator[](int i) { return exgChannels[i]; }
 };
@@ -34,12 +34,17 @@ class KnightProtocolParser : public serial::IProtocolParser
 
     public:
     KnightProtocolParser(double gain): mGain(gain) {}
+
     unsigned int parse(const void *buffer, unsigned int size,ResultVector &results);
     void onProtocolEvent(ResultVector &results);
+
+    virtual KnightSample parseSample(serial::IProtocolResult result); 
 };
 
 class KnightIMUProtocolParser : public KnightProtocolParser
 {
     const unsigned char messageLength()
     { return IMU_MESSAGE_LENGTH; }
+
+    KnightSample parseSample(serial::IProtocolResult result) override;
 };
