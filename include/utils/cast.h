@@ -1,4 +1,5 @@
 # pragma once
+# include "utils/vector3.hpp"
 
 
 inline unsigned int castTwoByteInteger (const unsigned char* bytes)
@@ -15,4 +16,13 @@ inline float castFourByteFloat (const unsigned char* bytes)
     float result;
     static_assert (sizeof (float) == 4, "float must be 4 bytes");
     return std::memcpy(&result, &littleEndianInt, 4);
+}
+
+inline Vector3 castVector3 (const unsigned char* bytes)
+{
+    return Vector3(
+        castFourByteFloat(bytes),
+        castFourByteFloat(bytes + 4),
+        castFourByteFloat(bytes + 8)
+    );
 }

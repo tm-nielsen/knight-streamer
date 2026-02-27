@@ -9,11 +9,11 @@ using ResultVector = std::vector<serial::IProtocolResult>;
 struct KnightSample
 {
     uint8_t counter;
-    double exgChannels[8];
+    double eegChannels[CHANNEL_COUNT];
     double lOffStatP;
     double lOffStatN;
 
-    double& operator[](int i) { return exgChannels[i]; }
+    double& operator[](int i) { return eegChannels[i]; }
 };
 
 struct KnightIMUSample : KnightSample
@@ -21,6 +21,8 @@ struct KnightIMUSample : KnightSample
     Vector3 acceleration;
     Vector3 mag;
     Vector3 gyro;
+
+    KnightIMUSample(KnightSample sample);
 };
 
 
