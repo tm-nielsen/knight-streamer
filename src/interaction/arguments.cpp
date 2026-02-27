@@ -17,14 +17,28 @@ CommandLineArguments ParseCommandLineArguments(int argc, char* argv[])
         .help("Serial port address of the target device")
         .store_into(arguments.serialPort);
 
-    parser.add_argument("-m", "--montage")
-        .help("Channel labels in a comma-delimited list")
-        .store_into(arguments.montage);
+    parser.add_argument("-g", "--gain", "--eeg-gain")
+        .help("EEG gain multiplier")
+        .choices(1, 2, 3, 4, 6, 8, 12)
+        .default_value(12)
+        .store_into(arguments.gain);
+
+    parser.add_argument("-i", "--imu", "--imu-board", "--use-imu-protocol")
+        .help("Interpret data stream using the eeg + imu protocol")
+        .default_value(false).implicit_value(true)
+        .store_into(arguments.useIMUProtocol);
+
+
+    parser.add_group("LSL Stream Parameters");
 
     parser.add_argument("-n", "--stream-name")
         .help("Name of the lsl stream through which to stream")
         .default_value("Knight_EEG")
         .store_into(arguments.streamName);
+
+    parser.add_argument("-m", "--montage")
+        .help("Channel labels in a comma-delimited list")
+        .store_into(arguments.montage);
 
     try
     {

@@ -15,7 +15,9 @@ int main(int argc, char* argv[])
     const char* port_name = selectPort(arguments.serialPort);
 
     serial::CSerialPort port;
-    KnightProtocolParser parser;
+    KnightProtocolParser parser = arguments.useIMUProtocol
+        ? KnightIMUProtocolParser(arguments.gain)
+        : KnightProtocolParser(arguments.gain);
     port.setProtocolParser(&parser);
 
     port.init(

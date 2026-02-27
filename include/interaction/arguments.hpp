@@ -3,8 +3,11 @@
 
 struct CommandLineArguments {
     std::string serialPort = "";
-    std::string montage = "";
+    int gain = 12;
+    bool useIMUProtocol = false;
+
     std::string streamName = "";
+    std::string montage = "";
 };
 
 CommandLineArguments ParseCommandLineArguments(int argc, char* argv[]);

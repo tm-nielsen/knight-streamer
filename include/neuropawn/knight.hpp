@@ -29,13 +29,13 @@ struct KnightIMUSample : KnightSample
 class KnightProtocolParser : public serial::IProtocolParser
 {
     protected:
-    unsigned char mGain = 12;
+    int mGain = 12;
 
     virtual const unsigned char messageLength()
     { return MESSAGE_LENGTH; }
 
     public:
-    KnightProtocolParser(unsigned char gain = 12): mGain(gain) {}
+    KnightProtocolParser(int gain = 12): mGain(gain) {}
 
     unsigned int parse(const void *buffer, unsigned int size,ResultVector &results);
     void onProtocolEvent(ResultVector &results);
@@ -45,8 +45,12 @@ class KnightProtocolParser : public serial::IProtocolParser
 
 class KnightIMUProtocolParser : public KnightProtocolParser
 {
+    protected:
     const unsigned char messageLength()
     { return IMU_MESSAGE_LENGTH; }
 
     KnightSample parseSample(serial::IProtocolResult result) override;
+
+    public:
+    KnightIMUProtocolParser(int gain = 12): KnightProtocolParser(gain) {}
 };
