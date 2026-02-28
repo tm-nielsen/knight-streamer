@@ -2,8 +2,9 @@
 # include "utils/print_helpers.hpp"
 
 
-const char* selectPort(std::string portName)
+const std::string selectPort(std::string argumentValue)
 {
+    std::string portName = argumentValue;
     while (portName.empty())
     {
         PRINT("Serial Port not specified.");
@@ -30,8 +31,8 @@ const char* selectPort(std::string portName)
             int selection = std::stoi(input);
 
             if (selection < 0) throw std::exception("invalid input");
-            if (selection > 0 && selection >= deviceCount) exit(0);
-            else if (selection > 1)
+            if (selection > 0 && selection > deviceCount) exit(0);
+            else if (selection > 0)
             {
                 portName = availableDevices[selection - 1].portName;
             }
@@ -44,5 +45,5 @@ const char* selectPort(std::string portName)
 
         if (portName.empty()) clear_lines(deviceCount + 5);
     }
-    return portName.c_str();
+    return portName;
 }
