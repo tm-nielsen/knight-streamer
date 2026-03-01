@@ -7,6 +7,7 @@
 # include <cstdio>
 # include <cstring>
 # include <cmath>
+# include <signal.h>
 
 #ifdef _WIN32
 #include <windows.h>
