@@ -43,5 +43,6 @@ namespace KnightProtocolConstants
     
     const unsigned char CHANNEL_COUNT = 8;
     const unsigned char SAMPLE_RATE = 125;
+    const unsigned int BAUD_RATE = 115200;
     const double BASE_EEG_SCALE = 4.0 / (std::pow(2.0, 15.0) - 1) / 1000000.0;
 }
