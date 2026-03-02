@@ -20,10 +20,13 @@ int main(int argc, char* argv[])
     }
     std::string portName = selectPort(arguments.serialPort);
 
+    PRINT("---");
+    OUTF("Opening serial port {}...", portName);
+
     serial::CSerialPort port;
     port.init(portName.c_str(), BAUD_RATE);
-    
     bool portOpened = port.open();
+
     if (!portOpened)
     {
         PRINTERR("Failed to open serial port " << portName);
@@ -42,15 +45,18 @@ int main(int argc, char* argv[])
     parser.setListener(&messenger);
     port.setProtocolParser(&parser);
 
-    PRINT("---");
-    PRINTF("Opened serial port {}.", portName)
-    sleep(2000);
+    messenger.awaitSample();
+    clear_line();
+    PRINTF("Opened serial port {}.", portName);
 
     for (int i = 1; i < CHANNEL_COUNT + 1; i++)
     {
-        enableKnightBoardEEGChannel(port, 1);
+        OUTF("Activating Channel {}...", i);
+        enableKnightBoardEEGChannel(port, i);
+        messenger.awaitSample();
+        clear_line();
     }
-    PRINT("Activated channels")
+    PRINT("Streaming Data.");
 
     while (!interrupted) { sleep(100); }
 

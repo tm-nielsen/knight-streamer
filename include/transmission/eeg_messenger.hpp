@@ -5,6 +5,7 @@
 class EEGMessenger : public IKnightSampleListener
 {
     lsl::stream_outlet* mOutlet;
+    bool mSampleReceived = false;
 
     public:
     ~EEGMessenger();
@@ -15,4 +16,5 @@ class EEGMessenger : public IKnightSampleListener
     );
     
     void onSampleReceived(KnightSample sample);
+    void awaitSample();
 };
