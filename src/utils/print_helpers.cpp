@@ -3,15 +3,13 @@
 
 void clear_line()
 {
-    std::cout << "\r\x1b[K";
+    std::cout << "\r\x1b[0J";
 }
 
 void clear_lines(int line_count)
 {
-    std::cout << "\x1b[2K";
-    for (int i = 1; i < line_count; i++)
-        std::cout << "\x1b[1A" << "\x1b[2K";
-    std::cout << "\r";
+    OUTF("\x1b[{}A", line_count - 1);
+    clear_line();
 }
 
 
