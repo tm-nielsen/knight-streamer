@@ -7,7 +7,7 @@ struct CommandLineArguments {
     bool useIMUProtocol = false;
 
     std::string streamName = "";
-    std::string montage = "";
+    std::string montageString = "";
 };
 
 const std::set<int> validGainValues = {1, 2, 3, 4, 6, 8, 12};

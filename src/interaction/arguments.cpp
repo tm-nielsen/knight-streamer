@@ -36,7 +36,7 @@ CommandLineArguments ParseCommandLineArguments(int argc, char* argv[])
 
     parser.add_argument("-m", "--montage")
         .help("Channel labels in a comma-delimited list")
-        .store_into(arguments.montage);
+        .store_into(arguments.montageString);
 
     try
     {

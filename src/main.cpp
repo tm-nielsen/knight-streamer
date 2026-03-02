@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
 {
     CommandLineArguments arguments = ParseCommandLineArguments(argc, argv);
 
-    if (arguments.montage.empty())
+    if (arguments.montageString.empty())
     {
         PRINT("Montage not specified, stream will be missing channel label metadata.");
     }
@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
     KnightProtocolParser parser = arguments.useIMUProtocol
         ? KnightIMUProtocolParser(arguments.gain)
         : KnightProtocolParser(arguments.gain);
-    EEGMessenger messenger {arguments.streamName};
+    EEGMessenger messenger {arguments.streamName, arguments.montageString};
 
     parser.setListener(&messenger);
     port.setProtocolParser(&parser);

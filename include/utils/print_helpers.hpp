@@ -15,4 +15,6 @@
 void clear_line();
 void clear_lines(int line_count);
 
+std::vector<std::string> splitString(std::string& input, char delimiter = ',');
+
 # endif
