@@ -65,7 +65,7 @@ KnightSample KnightProtocolParser::parseSample(serial::IProtocolResult result)
     for (int i = 0; i < CHANNEL_COUNT; i++)
     {
         const unsigned char* channelData = exgData + 2 * i;
-        unsigned int channelValue = castTwoByteInteger(channelData);
+        int channelValue = castTwoByteInteger(channelData);
         sample.eegChannels[i] = channelValue * eegScale;
     }
 

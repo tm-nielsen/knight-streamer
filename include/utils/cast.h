@@ -2,7 +2,7 @@
 # include "utils/vector3.hpp"
 
 
-inline unsigned int castTwoByteInteger (const unsigned char* bytes)
+inline int castTwoByteInteger (const unsigned char* bytes)
 {
     int prefix = bytes[0] > 0x7f? 0xffff : 0x0000;
     return prefix << 16 | bytes[0] << 8 | bytes[1];
