@@ -42,9 +42,9 @@ void EEGMessenger::onSampleReceived(KnightSample sample)
     mOutlet->push_sample(sample.eegChannels);
 }
 
-void EEGMessenger::awaitSample()
+void EEGMessenger::awaitSample(int minimumWaitTime)
 {
+    sleep(minimumWaitTime);
     mSampleReceived = false;
-    sleep(50);
     while (!mSampleReceived);
 }

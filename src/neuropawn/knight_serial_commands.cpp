@@ -13,7 +13,6 @@ bool writeSerialCommand(serial::CSerialPort &port, std::string command)
 {
     int commandLength = (int)command.length();
     int writtenBytes = port.writeData(command.c_str(), commandLength);
-    sleep(1);
     if (writtenBytes == commandLength) return true;
 
     PRINTERR("Failed to configure board.");

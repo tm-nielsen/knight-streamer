@@ -16,5 +16,5 @@ class EEGMessenger : public IKnightSampleListener
     );
     
     void onSampleReceived(KnightSample sample);
-    void awaitSample();
+    void awaitSample(int minimumWaitTime = 50);
 };
