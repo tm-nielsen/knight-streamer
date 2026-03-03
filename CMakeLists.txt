@@ -14,6 +14,7 @@ add_executable(${PROJECT_NAME}
     src/utils/io_helpers.cpp
     src/interaction/arguments.cpp
     src/interaction/port_selection.cpp
+    src/interaction/ellipsis_display.cpp
     src/neuropawn/knight.cpp
     src/neuropawn/knight_imu.cpp
     src/neuropawn/knight_serial_commands.cpp

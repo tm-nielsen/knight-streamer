@@ -3,18 +3,20 @@
 # define PCH_H
 
 # include <iostream>
+# include <thread>
 # include <string>
 # include <cstdio>
 # include <cstring>
 # include <cmath>
 # include <signal.h>
+# include <stdarg.h>
 
 #ifdef _WIN32
 #include <windows.h>
-#define sleep(microsecond) Sleep(microsecond) // ms
+#define sleep(milliseconds) Sleep(milliseconds)
 #else
 #include <unistd.h>
-#define sleep(microsecond) usleep(1000 * microsecond) // ms
+#define sleep(milliseconds) usleep(1000 * milliseconds)
 #endif
 
 

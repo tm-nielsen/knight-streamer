@@ -1,5 +1,6 @@
 # include "interaction/arguments.hpp"
 # include "interaction/port_selection.hpp"
+# include "interaction/ellipsis_display.hpp"
 # include "neuropawn/knight.hpp"
 # include "neuropawn/knight_serial_commands.hpp"
 # include "transmission/eeg_messenger.hpp"
@@ -7,6 +8,7 @@
 
 
 void HandleInterrupt(int);
+EllipsisDisplay ellipsisDisplay;
 serial::CSerialPort *portHandle;
 static bool interrupted = false;
 
@@ -17,7 +19,8 @@ int main(int argc, char* argv[])
     std::string portName = selectPort(arguments.serialPort);
 
     PRINT("---");
-    OUTF("Opening serial port {}...", portName);
+    OUTF("Opening serial port {}", portName);
+    ellipsisDisplay.start();
 
     serial::CSerialPort port;
     port.init(portName.c_str(), BAUD_RATE);
@@ -25,6 +28,8 @@ int main(int argc, char* argv[])
 
     if (!portOpened)
     {
+        ellipsisDisplay.stop();
+        clear_line();
         PRINTERR("Failed to open serial port " << portName);
         exit(1);
     }
@@ -44,7 +49,8 @@ int main(int argc, char* argv[])
 
     sleep(500);
     messenger.awaitSample(0, true);
-    clear_line();
+    ellipsisDisplay.pause();
+
     PRINTF("Opened serial port {}.", portName);
 
     for (int i = 0; i < CHANNEL_COUNT; i++)
@@ -54,19 +60,24 @@ int main(int argc, char* argv[])
             arguments.channelLabels[i].empty()
         ) continue;
 
-        OUTF("Activating Channel {}...", i + 1);
+        OUTF("Activating Channel {}", i + 1);
+        ellipsisDisplay.start();
         enableKnightBoardEEGChannel(port, i);
         messenger.awaitSample(i);
-        clear_line();
+        ellipsisDisplay.pause();
 
-        OUTF("Adding channel {} to Right Leg Drive...", i + 1);
+        OUTF("Adding channel {} to Right Leg Drive", i + 1);
+        ellipsisDisplay.start();
         addKnightBoardChannelToRightLegDrive(port, i);
         messenger.awaitSample(i);
-        clear_line();
+        ellipsisDisplay.pause();
     }
-    PRINT("Streaming Data.");
+    COUT("Streaming Data");
+    ellipsisDisplay.start();
 
-    while (true) { sleep(100); }
+    while (true) {
+        sleep(100);
+    }
 }
 
 
@@ -75,6 +86,7 @@ void HandleInterrupt(int s)
     if (!interrupted)
     {
         interrupted = true;
+        ellipsisDisplay.stop();
         PRINT("-!-");
         PRINT("Closing port...")
         portHandle->close();
