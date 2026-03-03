@@ -58,6 +58,11 @@ int main(int argc, char* argv[])
         enableKnightBoardEEGChannel(port, i);
         messenger.awaitSample(i - 1);
         clear_line();
+
+        OUTF("Adding channel {} to Right Leg Drive...", i);
+        addKnightBoardChannelToRightLegDrive(port, i);
+        messenger.awaitSample(i - 1);
+        clear_line();
     }
     PRINT("Streaming Data.");
 
