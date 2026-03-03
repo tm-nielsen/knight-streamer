@@ -60,7 +60,7 @@ KnightSample KnightProtocolParser::parseSample(serial::IProtocolResult result)
     sample.counter = result.data[1];
 
     const unsigned char* exgData = result.data + EXG_DATA_OFFSET;
-    double eegScale = mGain * BASE_EEG_SCALE;
+    double eegScale = BASE_EEG_SCALE / mGain;
 
     for (int i = 0; i < CHANNEL_COUNT; i++)
     {
