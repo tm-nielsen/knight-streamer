@@ -17,7 +17,7 @@ add_executable(${PROJECT_NAME}
     src/interaction/ellipsis_display.cpp
     src/neuropawn/knight.cpp
     src/neuropawn/knight_imu.cpp
-    src/neuropawn/knight_serial_commands.cpp
+    src/neuropawn/knight_serial_interface.cpp
     src/transmission/eeg_messenger.cpp
 )
 target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX)

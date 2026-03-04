@@ -1,5 +1,4 @@
 # include "interaction/ellipsis_display.hpp"
-# include "utils/io_helpers.hpp"
 
 
 EllipsisDisplay::EllipsisDisplay(int period, int length)
@@ -20,10 +19,15 @@ void EllipsisDisplay::start()
     }
 }
 
-void EllipsisDisplay::pause(bool clearLine)
+void EllipsisDisplay::pause()
 {
     mKeepDisplayRunning = false;
-    if (clearLine) clear_line();
+    clearDots();
+}
+void EllipsisDisplay::pauseAndClearLine()
+{
+    mKeepDisplayRunning = false;
+    clear_line();
 }
 
 void EllipsisDisplay::stop()
@@ -31,7 +35,7 @@ void EllipsisDisplay::stop()
     mKeepDisplayRunning = false;
     mKeepDisplayThreadAlive = false;
 
-    OUTF("\x1b[{}D", mDotCounter);
+    clearDots();
 
     if (mDisplayThread.joinable())
     {
@@ -47,14 +51,14 @@ void EllipsisDisplay::runDisplay()
     {
         if (mKeepDisplayRunning)
         {
-            if (++mDotCounter <= mLength)
+            if (mDotCounter < mLength)
             {
                 std::cout << '.';
+                mDotCounter++;
             }
             else
             {
-                OUTF("\x1b[{}D", mLength)
-                COUT("\x1b[K")
+                clearDots();
                 mDotCounter = 0;
             }
         }

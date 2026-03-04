@@ -1,16 +1,19 @@
 # include "interaction/arguments.hpp"
 # include "interaction/port_selection.hpp"
 # include "interaction/ellipsis_display.hpp"
-# include "neuropawn/knight.hpp"
-# include "neuropawn/knight_serial_commands.hpp"
+# include "neuropawn/knight_serial_interface.hpp"
 # include "transmission/eeg_messenger.hpp"
 # include "utils/io_helpers.hpp"
 
 
 void HandleInterrupt(int);
-EllipsisDisplay ellipsisDisplay;
-serial::CSerialPort *portHandle;
 static bool interrupted = false;
+
+KnightBoardSerialInterface *boardInterfaceHandle;
+
+EllipsisDisplay ellipsisDisplay;
+void startWaitDisplay() { ellipsisDisplay.start(); }
+void pauseWaitDisplay() { ellipsisDisplay.pauseAndClearLine(); }
 
 
 int main(int argc, char* argv[])
@@ -20,62 +23,40 @@ int main(int argc, char* argv[])
 
     PRINT("---");
     OUTF("Opening serial port {}", portName);
-    ellipsisDisplay.start();
+    startWaitDisplay();
 
-    serial::CSerialPort port;
-    port.init(portName.c_str(), BAUD_RATE);
-    bool portOpened = port.open();
-
-    if (!portOpened)
+    KnightBoardSerialInterface boardInterface(
+        startWaitDisplay, pauseWaitDisplay
+    );
+    if (!boardInterface.openPort(portName))
     {
         ellipsisDisplay.stop();
         clear_line();
         PRINTERR("Failed to open serial port " << portName);
         exit(1);
     }
+    pauseWaitDisplay();
+    PRINTF("Opened serial port {}.", portName);
     
-    portHandle = &port;
+    boardInterfaceHandle = &boardInterface;
     signal(SIGINT, HandleInterrupt);
     signal(SIGTERM, HandleInterrupt);
 
+    EEGMessenger messenger {
+        arguments.streamName,
+        arguments.channelLabels
+    };
 
-    KnightProtocolParser parser = arguments.useIMUProtocol
-        ? KnightIMUProtocolParser(arguments.gain)
-        : KnightProtocolParser(arguments.gain);
-    EEGMessenger messenger {arguments.streamName, arguments.channelLabels};
+    OUTF("Initializing Board");
+    boardInterface.initialize(
+        arguments.gain,
+        arguments.useIMUProtocol,
+        &messenger
+    );
+    boardInterface.activateChannels(messenger.getEnabledChannels());
 
-    parser.setListener(&messenger);
-    port.setProtocolParser(&parser);
-
-    port.flushReadBuffers();
-    messenger.awaitSample(0, true);
-    ellipsisDisplay.pause();
-
-    PRINTF("Opened serial port {}.", portName);
-
-    for (int i = 0; i < CHANNEL_COUNT; i++)
-    {
-        if (
-            !arguments.channelLabels.empty() &&
-            arguments.channelLabels[i].empty()
-        ) continue;
-
-        OUTF("Activating Channel {}", i + 1);
-        ellipsisDisplay.start();
-        enableKnightBoardEEGChannel(port, i);
-        port.flushReadBuffers();
-        messenger.awaitSample(i);
-        ellipsisDisplay.pause();
-
-        OUTF("Adding channel {} to Right Leg Drive", i + 1);
-        ellipsisDisplay.start();
-        addKnightBoardChannelToRightLegDrive(port, i);
-        port.flushReadBuffers();
-        messenger.awaitSample(i);
-        ellipsisDisplay.pause();
-    }
     COUT("Streaming Data");
-    ellipsisDisplay.start();
+    startWaitDisplay();
 
     while (true) {
         sleep(100);
@@ -89,9 +70,9 @@ void HandleInterrupt(int s)
     {
         interrupted = true;
         ellipsisDisplay.stop();
-        PRINT("-!-");
-        PRINT("Closing port...")
-        portHandle->close();
+        PRINT(std::endl << "-!-");
+        PRINT("Closing port.")
+        boardInterfaceHandle->closePort();
         exit(0);
     }
     signal(s, HandleInterrupt);

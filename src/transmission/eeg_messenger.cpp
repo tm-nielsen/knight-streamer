@@ -51,7 +51,7 @@ EEGMessenger::~EEGMessenger()
 
 void EEGMessenger::onSampleReceived(KnightSample sample)
 {
-    mLastSampleReceived = sample;
+    mLatestSample = sample;
 
     std::vector<double> activeChannelValues {};
     for (int channelIndex : enabledChannels)
@@ -59,12 +59,4 @@ void EEGMessenger::onSampleReceived(KnightSample sample)
         activeChannelValues.emplace_back(sample[channelIndex]);
     }
     mOutlet->push_sample(activeChannelValues);
-}
-
-void EEGMessenger::awaitSample(int channelIndex, bool allowZeroValue)
-{
-    uint8_t lastCounterValue = mLastSampleReceived.counter;
-    while (mLastSampleReceived.counter == lastCounterValue);
-    if (allowZeroValue) return;
-    while (mLastSampleReceived.eegChannels[channelIndex] == 0);
 }

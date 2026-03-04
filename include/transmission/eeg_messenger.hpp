@@ -5,7 +5,7 @@
 class EEGMessenger : public IKnightSampleListener
 {
     lsl::stream_outlet* mOutlet;
-    KnightSample mLastSampleReceived;
+    KnightSample mLatestSample;
     std::vector<int> enabledChannels;
 
     public:
@@ -15,7 +15,10 @@ class EEGMessenger : public IKnightSampleListener
         std::vector<std::string> channelLabels,
         std::string sourceId = "Knight_Streamer"
     );
+
+    std::vector<int> getEnabledChannels() { return enabledChannels; }
+    unsigned char getLatestCounter() { return mLatestSample.counter; }
+    double getLatestChannelValue(int channelIndex) { return mLatestSample[channelIndex]; }
     
     void onSampleReceived(KnightSample sample);
-    void awaitSample(int channelIndex, bool allowZeroValue = false);
 };

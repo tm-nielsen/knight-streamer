@@ -1,4 +1,5 @@
 # pragma once
+# include "utils/io_helpers.hpp"
 
 
 class EllipsisDisplay
@@ -15,11 +16,13 @@ class EllipsisDisplay
     bool mKeepDisplayRunning = false;
 
     void runDisplay();
+    inline void clearDots() { OUTF("\x1b[{}D\x1b[K", mDotCounter); }
 
     public:
     EllipsisDisplay(int period = 250, int length = 3);
 
     void start();
-    void pause(bool clearLine = true);
+    void pause();
+    void pauseAndClearLine();
     void stop();
 };
