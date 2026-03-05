@@ -36,6 +36,7 @@ int main(int argc, char* argv[])
         arguments.channelLabels
     };
 
+    boardInterfaceHandle = &boardInterface;
     boardInterface.initialize(
         portName,
         arguments.gain,
@@ -53,8 +54,6 @@ int main(int argc, char* argv[])
     pauseWaitDisplay();
 
     PRINTF("Opened serial port {}.", portName);
-    
-    boardInterfaceHandle = &boardInterface;
     signal(SIGINT, HandleInterrupt);
     signal(SIGTERM, HandleInterrupt);
     
@@ -113,5 +112,6 @@ void ensureSuccess(bool result, std::string exitMessage)
     ellipsisDisplay.stop();
     clear_line();
     PRINTERR(exitMessage);
+    boardInterfaceHandle->closePort();
     exit(EXIT_SUCCESS);
 }
