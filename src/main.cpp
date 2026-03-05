@@ -82,6 +82,8 @@ int main(int argc, char* argv[])
     }
 
     boardInterface.activateChannels(messenger.getEnabledChannels());
+    PRINT("Channel Activation Complete.");
+    PRINT("---");
 
     COUT("Streaming Data");
     startWaitDisplay();

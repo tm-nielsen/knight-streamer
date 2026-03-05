@@ -4,11 +4,15 @@
 
 const std::string selectPort(std::string argumentValue)
 {
+    if (argumentValue.empty())
+    {
+        PRINT("Serial Port not specified.");
+        PRINT("---");
+    }
     std::string portName = argumentValue;
     while (portName.empty())
     {
-        PRINT("Serial Port not specified.");
-        PRINT("\t0) rescan");
+        PRINT("0)\trescan");
 
         auto availableDevices = serial::CSerialPortInfo::availablePortInfos();
         int deviceCount = (int)availableDevices.size();
@@ -17,11 +21,11 @@ const std::string selectPort(std::string argumentValue)
         for (const serial::SerialPortInfo& device : availableDevices)
         {
             PRINTF(
-                "\t{}) {} : {}", deviceIndex++,
+                "{})\t{} : {}", deviceIndex++,
                 device.portName, device.description
             );
         }
-        PRINTF("\t{}) exit", deviceIndex);
+        PRINTF("{})\texit", deviceIndex);
         OUTF("Which do you want to use? [0-{}]\t", deviceIndex);
 
         try
@@ -46,7 +50,7 @@ const std::string selectPort(std::string argumentValue)
             (void)err; exit(EXIT_SUCCESS);
         }
 
-        if (portName.empty()) clear_lines(deviceCount + 5);
+        if (portName.empty()) clear_lines(deviceCount + 4);
     }
     return portName;
 }

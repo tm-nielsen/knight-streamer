@@ -16,7 +16,9 @@ class EllipsisDisplay
     bool mKeepDisplayRunning = false;
 
     void runDisplay();
-    inline void clearDots() { OUTF("\x1b[{}D\x1b[K", mDotCounter); }
+    inline void clearDots() {
+        if(mDotCounter) OUTF("\x1b[{}D\x1b[K", mDotCounter);
+    }
 
     public:
     EllipsisDisplay(int period = 250, int length = 3);
