@@ -58,7 +58,7 @@ CommandLineArguments ParseCommandLineArguments(int argc, char* argv[])
     catch (const std::exception& err)
     {
         PRINTERR(err.what());
-        std::exit(1);
+        exit(EXIT_SUCCESS);
     }
     return arguments;
 }

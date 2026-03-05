@@ -30,7 +30,7 @@ const std::string selectPort(std::string argumentValue)
             std::cin >> input;
             int selection = std::stoi(input);
 
-            if (selection == deviceCount + 1) exit(0);
+            if (selection == deviceCount + 1) exit(EXIT_SUCCESS);
             if (selection < 0 || selection > deviceCount + 1)
             {
                 throw std::exception("invalid input");
@@ -43,7 +43,7 @@ const std::string selectPort(std::string argumentValue)
         catch (const std::exception& err)
         {
             PRINT("Invalid selection, exiting...")
-            (void)err; exit(0);
+            (void)err; exit(EXIT_SUCCESS);
         }
 
         if (portName.empty()) clear_lines(deviceCount + 5);

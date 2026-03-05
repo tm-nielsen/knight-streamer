@@ -11,7 +11,7 @@ void writeSerialCommand(serial::CSerialPort &port, std::string command)
     {
         PRINTERR("Failed to configure board.");
         port.close();
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 }
 

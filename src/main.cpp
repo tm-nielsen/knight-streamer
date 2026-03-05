@@ -15,6 +15,8 @@ EllipsisDisplay ellipsisDisplay;
 void startWaitDisplay() { ellipsisDisplay.start(); }
 void pauseWaitDisplay() { ellipsisDisplay.pauseAndClearLine(); }
 
+void ensureSuccess(bool result, std::string exitMessage);
+
 
 int main(int argc, char* argv[])
 {
@@ -40,19 +42,16 @@ int main(int argc, char* argv[])
         arguments.useIMUProtocol,
         &messenger
     );
-
     pauseWaitDisplay();
+
     OUTF("Opening serial port {}", portName);
     startWaitDisplay();
-
-    if (!boardInterface.openPort())
-    {
-        ellipsisDisplay.stop();
-        clear_line();
-        PRINTERR("Failed to open serial port " << portName);
-        exit(1);
-    }
+    ensureSuccess(
+        boardInterface.openPort(),
+        std::format("Failed to open serial port {}.", portName)
+    );
     pauseWaitDisplay();
+
     PRINTF("Opened serial port {}.", portName);
     
     boardInterfaceHandle = &boardInterface;
@@ -60,11 +59,10 @@ int main(int argc, char* argv[])
     signal(SIGTERM, HandleInterrupt);
     
     OUTF("Waiting for board response")
-    if (!boardInterface.awaitBoardResponse())
-    {
-        PRINTERR("Board is not responding.");
-        exit(1);
-    }
+    ensureSuccess(
+        boardInterface.awaitBoardResponse(),
+        "Board is not responding."
+    );
 
     boardInterface.activateChannels(messenger.getEnabledChannels());
 
@@ -86,7 +84,16 @@ void HandleInterrupt(int s)
         PRINT(std::endl << "-!-");
         PRINT("Closing port.")
         boardInterfaceHandle->closePort();
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
     signal(s, HandleInterrupt);
+}
+
+void ensureSuccess(bool result, std::string exitMessage)
+{
+    if (result) return;
+    ellipsisDisplay.stop();
+    clear_line();
+    PRINTERR(exitMessage);
+    exit(EXIT_SUCCESS);
 }
