@@ -64,4 +64,5 @@ class KnightProtocolParser : public serial::IProtocolParser
     void removeListener();
 
     bool hasReceivedData() { return mHasReceivedData; }
+    void resetDataReceptionFlag() { mHasReceivedData = false; }
 };

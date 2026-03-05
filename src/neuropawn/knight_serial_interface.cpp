@@ -35,6 +35,8 @@ void KnightBoardSerialInterface::swapProtocolFormat(bool useIMUProtocol)
 
 bool KnightBoardSerialInterface::awaitDeviceResponse(int timeout)
 {
+    mPort.flushBuffers();
+    mParser.resetDataReceptionFlag();
     return awaitPortCondition(
         [this](){ return mParser.hasReceivedData(); },
         timeout
@@ -53,26 +55,32 @@ void KnightBoardSerialInterface::activateChannels(std::vector<int> channelIndice
     {
         int pinIndex = channelIndex + 1;
 
-        OUTF("Activating Channel {}", pinIndex);
         ensureChannelConfiguration(
-            channelIndex, std::format("chon_{}_{}", pinIndex, mGain)
+            channelIndex, std::format("chon_{}_{}", pinIndex, mGain),
+            std::format("Activating Channel {}", pinIndex)
         );
-
-        OUTF("Adding channel {} to Right Leg Drive", pinIndex);
         ensureChannelConfiguration(
-            channelIndex, std::format("rldadd_{}", pinIndex)
+            channelIndex, std::format("rldadd_{}", pinIndex),
+            std::format("Adding channel {} to Right Leg Drive", pinIndex)
         );
     }
 }
 
 
-void KnightBoardSerialInterface::ensureChannelConfiguration(int channelIndex, std::string command)
+void KnightBoardSerialInterface::ensureChannelConfiguration
+(
+    int channelIndex, std::string command,
+    std::string commandDescription
+)
 {
     bool channelValueReceived = false;
     while (!channelValueReceived)
     {
+        COUT(commandDescription);
         writeSerialCommand(mPort, command);
-        if (!awaitChannelValue(channelIndex))
+        sleep(50);
+        if (awaitChannelValue(channelIndex)) return;
+        else
         {
             PRINT("No response from board, trying again.");
         }

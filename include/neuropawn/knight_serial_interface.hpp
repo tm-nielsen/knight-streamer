@@ -14,11 +14,14 @@ class KnightBoardSerialInterface
     void (*mOnWaitStarted)();
     void (*mOnWaitCompleted)();
 
-    bool awaitChannelValue(int channelIndex, int timeout = 1000);
+    bool awaitChannelValue(int channelIndex, int timeout = 2000);
     bool awaitPortCondition(std::function<bool()> predicate, int timeout);
     std::function<bool()> buildNewSamplePredicate();
 
-    void ensureChannelConfiguration(int channelIndex, std::string command);
+    void ensureChannelConfiguration(
+        int channelIndex, std::string command,
+        std::string commandDescription
+    );
 
     public:
     KnightBoardSerialInterface(
