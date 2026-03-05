@@ -58,11 +58,29 @@ int main(int argc, char* argv[])
     signal(SIGINT, HandleInterrupt);
     signal(SIGTERM, HandleInterrupt);
     
-    OUTF("Waiting for board response")
+    COUT("Waiting for device response");
     ensureSuccess(
-        boardInterface.awaitBoardResponse(),
-        "Board is not responding."
+        boardInterface.awaitDeviceResponse(),
+        "Device is not responding."
     );
+
+    COUT("Waiting for data stream");
+    if (!boardInterface.awaitParsedData())
+    {
+        OUTF(
+            "Failed to parse {} data, switching format",
+            arguments.useIMUProtocol? "IMU": "standard"
+        );
+        boardInterface.swapProtocolFormat(!arguments.useIMUProtocol);
+        ensureSuccess(
+            boardInterface.awaitParsedData(),
+            "Data does not fit any expected format. Try another device."
+        );
+        PRINTF(
+            "Data fits {} format, consider setting the protocol flag aproproately",
+            arguments.useIMUProtocol? "standard": "IMU"
+        );
+    }
 
     boardInterface.activateChannels(messenger.getEnabledChannels());
 

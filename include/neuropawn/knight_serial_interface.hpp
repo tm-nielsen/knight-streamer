@@ -36,6 +36,10 @@ class KnightBoardSerialInterface
         int gain, bool useIMUProtocol,
         EEGMessenger *messenger
     );
-    bool awaitBoardResponse(int timeout = 8000);
+    void swapProtocolFormat(bool useIMUProtocol);
+
+    bool awaitDeviceResponse(int timeout = 8000);
+    bool awaitParsedData(int timeout = 500);
+
     void activateChannels(std::vector<int> channelIndices);
 };

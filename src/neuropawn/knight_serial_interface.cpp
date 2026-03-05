@@ -13,16 +13,35 @@ void KnightBoardSerialInterface::initialize
     mPort.init(portName.c_str(), BAUD_RATE);
     mGain = gain;
     mMessenger = messenger;
-    mParser = useIMUProtocol
-        ? KnightProtocolParser(KnightSample::parse, IMU_MESSAGE_LENGTH, gain)
-        : KnightProtocolParser(KnightIMUSample::parse, MESSAGE_LENGTH, gain);
+    mParser = KnightProtocolParser(
+        gain, useIMUProtocol
+        ? KnightProtocolParser::IMU_FORMAT
+        : KnightProtocolParser::STANDARD_FORMAT
+    );
 
     mParser.setListener(mMessenger);
     mPort.setProtocolParser(&mParser);
 }
 
+void KnightBoardSerialInterface::swapProtocolFormat(bool useIMUProtocol)
+{
+    mParser.applyFormat(
+        useIMUProtocol
+        ? KnightProtocolParser::IMU_FORMAT
+        : KnightProtocolParser::STANDARD_FORMAT
+    );
+}
 
-bool KnightBoardSerialInterface::awaitBoardResponse(int timeout)
+
+bool KnightBoardSerialInterface::awaitDeviceResponse(int timeout)
+{
+    return awaitPortCondition(
+        [this](){ return mParser.hasReceivedData(); },
+        timeout
+    );
+}
+
+bool KnightBoardSerialInterface::awaitParsedData(int timeout)
 {
     return awaitPortCondition(buildNewSamplePredicate(), timeout);
 }
