@@ -11,21 +11,22 @@ class KnightBoardSerialInterface
     EEGMessenger *mMessenger;
     int mGain;
 
-    void (*mOnWaitStarted)();
-    void (*mOnWaitCompleted)();
-
-    bool awaitChannelValue(int channelIndex, int timeout = 2000);
-    bool awaitPortCondition(std::function<bool()> predicate, int timeout);
-    std::function<bool()> buildNewSamplePredicate();
+    std::function<void()> mOnWaitStarted;
+    std::function<void()> mOnWaitCompleted;
 
     void ensureChannelConfiguration(
         int channelIndex, std::string command,
         std::string commandDescription
     );
+    bool awaitChannelValue(int channelIndex, int timeout = 2000);
+    bool awaitCondition(std::function<bool()> predicate, int timeout);
+    unsigned int readAndParseUsedBuffer();
+    void discardReadBuffer();
 
     public:
     KnightBoardSerialInterface(
-        void (onWaitStarted)(), void (onWaitCompleted)()
+        std::function<void()> onWaitStarted,
+        std::function<void()> onWaitCompleted
     ):
         mOnWaitStarted(onWaitStarted),
         mOnWaitCompleted(onWaitCompleted)
@@ -44,6 +45,8 @@ class KnightBoardSerialInterface
 
     bool awaitSerialData(int timeout = 8000);
     bool awaitParsedData(int timeout = 500);
+
+    void streamData();
 
     void activateChannels(std::vector<int> channelIndices);
 };

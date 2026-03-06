@@ -16,15 +16,15 @@ void writeSerialCommand(serial::CSerialPort &port, std::string command)
 }
 
 
-unsigned int splitBufferIntoMessages
+std::vector<SerialMessage> splitBufferIntoMessages
 (
     const void *buffer, unsigned int bufferSize,
     unsigned int messageLength,
     const unsigned char startByte,
-    const unsigned char endByte,
-    ResultVector &results
+    const unsigned char endByte
 )
 {
+    std::vector<SerialMessage> messages;
     unsigned int offset = 0;
     unsigned int processedSize = 0;
     const unsigned char *ptr = static_cast<const unsigned char*>(buffer);
@@ -44,10 +44,10 @@ unsigned int splitBufferIntoMessages
         }
         else
         {
-            const unsigned char* message = ptr + startByteOffset;
-            if (message[messageLength - 1] == endByte)
+            const unsigned char* messageStart = ptr + startByteOffset;
+            if (messageStart[messageLength - 1] == endByte)
             {
-                results.emplace_back(message, messageLength);
+                messages.emplace_back(messageStart, messageLength);
                 offset = startByteOffset + messageLength;
                 processedSize = offset;
                 startByteFound = false;
@@ -57,7 +57,7 @@ unsigned int splitBufferIntoMessages
         }
     }
 
-    return processedSize;
+    return messages;
 }
 
 

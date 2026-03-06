@@ -87,17 +87,12 @@ int main(int argc, char* argv[])
 
     COUT("Streaming Data");
     startWaitDisplay();
-
-    while (true) {
-        sleep(100);
-        if (!boardInterface.isConnected())
-        {
-            ellipsisDisplay.stop();
-            PRINT(std::endl << "---")
-            PRINT("Device Disconnected.");
-            break;
-        }
-    }
+    boardInterface.streamData();
+    
+    ellipsisDisplay.stop();
+    PRINT(std::endl << "---")
+    PRINT("Device Disconnected.");
+    return EXIT_SUCCESS;
 }
 
 

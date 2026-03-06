@@ -17,27 +17,29 @@ void KnightProtocolParser::applyFormat(ProtocolFormat format)
     }
 }
 
-unsigned int KnightProtocolParser::parse
+unsigned int KnightProtocolParser::processBuffer
 (
-    const void *buffer, unsigned int size,
-    ResultVector &results
+    const void *buffer, unsigned int size
 )
 {
-    mHasReceivedData |= size > mMessageLength;
-    return splitBufferIntoMessages(
+    std::vector<SerialMessage> messages = splitBufferIntoMessages(
         buffer, size,
         mMessageLength,
-        START_BYTE, END_BYTE,
-        results
+        START_BYTE, END_BYTE
     );
+    mHasReceivedData |= size > 0;
+    mHasParsedMessage |= !messages.empty();
+
+    if (mListener) notifyListener(messages);
+    return (unsigned int)messages.size();
 }
 
-
-void KnightProtocolParser::onProtocolEvent(ResultVector &results)
+void KnightProtocolParser::notifyListener(std::vector<SerialMessage> messages)
 {
-    for (const serial::IProtocolResult& result : results)
+    if (!mListener) return;
+    for (const SerialMessage message : messages)
     {
-        KnightSample sample = mSampleConstructor(result.data, mGain);
+        KnightSample sample = mSampleConstructor(message.data, mGain);
         if (mListener) mListener->onSampleReceived(sample);
     }
 }

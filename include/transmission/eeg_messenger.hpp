@@ -7,8 +7,7 @@ class EEGMessenger : public IKnightSampleListener
     lsl::stream_outlet* mOutlet;
     std::vector<int> enabledChannels;
 
-    volatile unsigned char mLatestCounter;
-    volatile double mLatestChannelValues[CHANNEL_COUNT];
+    bool mChannelValueReceptionFlags [CHANNEL_COUNT];
 
     public:
     ~EEGMessenger();
@@ -18,9 +17,9 @@ class EEGMessenger : public IKnightSampleListener
         std::string sourceId = "Knight_Streamer"
     );
 
-    std::vector<int> getEnabledChannels() { return enabledChannels; }
-    unsigned char getLatestCounter() { return mLatestCounter; }
-    double getLatestChannelValue(int channelIndex) { return mLatestChannelValues[channelIndex]; }
-    
     void onSampleReceived(KnightSample sample);
+
+    std::vector<int> getEnabledChannels() { return enabledChannels; }
+    bool hasReceivedChannelValue(int channelIndex) { return mChannelValueReceptionFlags[channelIndex]; }
+    void resetChannelReceptionFlag(int channelIndex) { mChannelValueReceptionFlags[channelIndex] = false; }
 };

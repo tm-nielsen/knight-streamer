@@ -37,7 +37,7 @@ class IKnightSampleListener
 };
 
 
-class KnightProtocolParser : public serial::IProtocolParser
+class KnightProtocolParser
 {
     protected:
     KnightSample (*mSampleConstructor)(const unsigned char* data, int gain);
@@ -46,6 +46,9 @@ class KnightProtocolParser : public serial::IProtocolParser
     int mGain;
     unsigned char mMessageLength;
     bool mHasReceivedData;
+    bool mHasParsedMessage;
+
+    void notifyListener(std::vector<SerialMessage> messages);
 
     public:
     enum ProtocolFormat { STANDARD, IMU };
@@ -55,14 +58,13 @@ class KnightProtocolParser : public serial::IProtocolParser
     KnightProtocolParser(int gain = 12, ProtocolFormat format = STANDARD_FORMAT)
     : mGain(gain){ applyFormat(format); }
 
-    unsigned int parse(const void *buffer, unsigned int size, ResultVector &results);
-    void onProtocolEvent(ResultVector &results);
-
     void applyFormat(ProtocolFormat format);
+    unsigned int processBuffer(const void *buffer, unsigned int size);
 
     void setListener(IKnightSampleListener* listener);
     void removeListener();
 
+    unsigned int messageLength() { return mMessageLength; }
     bool hasReceivedData() { return mHasReceivedData; }
-    void resetDataReceptionFlag() { mHasReceivedData = false; }
+    bool hasParsedMessage() { return mHasParsedMessage; }
 };

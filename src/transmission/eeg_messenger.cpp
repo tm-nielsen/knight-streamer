@@ -51,12 +51,14 @@ EEGMessenger::~EEGMessenger()
 
 void EEGMessenger::onSampleReceived(KnightSample sample)
 {
-    mLatestCounter = sample.counter;
+    for (int channelIndex = 0; channelIndex < CHANNEL_COUNT; channelIndex++)
+    {
+        mChannelValueReceptionFlags[channelIndex] = sample[channelIndex] != 0;
+    }
 
     std::vector<double> activeChannelValues {};
     for (int channelIndex : enabledChannels)
     {
-        mLatestChannelValues[channelIndex] = sample[channelIndex];
         activeChannelValues.emplace_back(sample[channelIndex]);
     }
     mOutlet->push_sample(activeChannelValues);

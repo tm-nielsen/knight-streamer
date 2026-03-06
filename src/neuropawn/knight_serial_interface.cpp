@@ -10,8 +10,11 @@ void KnightBoardSerialInterface::initialize
     EEGMessenger *messenger
 )
 {
-    mPort.init(portName.c_str(), BAUD_RATE);
     mGain = gain;
+
+    mPort.init(portName.c_str(), BAUD_RATE);
+    mPort.setOperateMode(serial::NativeSynchronousOperate);
+
     mMessenger = messenger;
     mParser = KnightProtocolParser(
         gain, useIMUProtocol
@@ -20,7 +23,6 @@ void KnightBoardSerialInterface::initialize
     );
 
     mParser.setListener(mMessenger);
-    mPort.setProtocolParser(&mParser);
 }
 
 void KnightBoardSerialInterface::swapProtocolFormat(bool useIMUProtocol)
@@ -35,17 +37,19 @@ void KnightBoardSerialInterface::swapProtocolFormat(bool useIMUProtocol)
 
 bool KnightBoardSerialInterface::awaitSerialData(int timeout)
 {
-    mPort.flushBuffers();
-    mParser.resetDataReceptionFlag();
-    return awaitPortCondition(
-        [this](){ return mParser.hasReceivedData(); },
-        timeout
+    discardReadBuffer();
+    return awaitCondition(
+        [this](){ return mParser.hasReceivedData(); }
+        , timeout
     );
 }
 
 bool KnightBoardSerialInterface::awaitParsedData(int timeout)
 {
-    return awaitPortCondition(buildNewSamplePredicate(), timeout);
+    return awaitCondition(
+        [this](){ return mParser.hasParsedMessage(); }
+        , timeout
+    );
 }
 
 
@@ -78,7 +82,6 @@ void KnightBoardSerialInterface::ensureChannelConfiguration
     {
         COUT(commandDescription);
         writeSerialCommand(mPort, command);
-        sleep(50);
         if (awaitChannelValue(channelIndex)) return;
         else
         {
@@ -90,25 +93,23 @@ void KnightBoardSerialInterface::ensureChannelConfiguration
 
 bool KnightBoardSerialInterface::awaitChannelValue(int channelIndex, int timeout)
 {
-    auto newSamplePredicate = buildNewSamplePredicate();
-    return awaitPortCondition(
-        [newSamplePredicate, channelIndex, this]()
-        {
-            return newSamplePredicate() &&
-            mMessenger->getLatestChannelValue(channelIndex) != 0;
-        },
-        timeout
+    discardReadBuffer();
+    mMessenger->resetChannelReceptionFlag(channelIndex);
+    return awaitCondition(
+        [channelIndex, this]() { return mMessenger-> hasReceivedChannelValue(channelIndex); }
+        , timeout
     );
 }
 
-bool KnightBoardSerialInterface::awaitPortCondition(std::function<bool()> predicate, int timeout)
+bool KnightBoardSerialInterface::awaitCondition(std::function<bool()> predicate, int timeout)
 {
     if (mOnWaitStarted) mOnWaitStarted();
-    mPort.flushBuffers();
 
     long long startTime = getCurrentTimestamp();
     while (!predicate())
     {
+        readAndParseUsedBuffer();
+
         sleep(10);
         long long currentTime = getCurrentTimestamp();
         if (currentTime - startTime > timeout)
@@ -122,9 +123,24 @@ bool KnightBoardSerialInterface::awaitPortCondition(std::function<bool()> predic
     return true;
 }
 
-std::function<bool()> KnightBoardSerialInterface::buildNewSamplePredicate()
+
+void KnightBoardSerialInterface::streamData()
 {
-    unsigned char lastCounterValue = mMessenger->getLatestCounter();
-    return [lastCounterValue, this]()
-    { return mMessenger->getLatestCounter() != lastCounterValue; };
+    while(readAndParseUsedBuffer() >= 0) sleep(1);
+}
+
+unsigned int KnightBoardSerialInterface::readAndParseUsedBuffer()
+{
+    char buffer[4096];
+    unsigned int usedBufferLength = mPort.getReadBufferUsedLen();
+    if (usedBufferLength < 2 * mParser.messageLength()) return 0;
+
+    mPort.readData(buffer, usedBufferLength);
+    return mParser.processBuffer(buffer, usedBufferLength);
+}
+
+void KnightBoardSerialInterface::discardReadBuffer()
+{
+    char dumpster[4096];
+    mPort.readAllData(dumpster);
 }
