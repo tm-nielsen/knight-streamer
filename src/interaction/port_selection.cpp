@@ -37,14 +37,14 @@ const std::string selectPort(std::string argumentValue)
             if (selection == deviceCount + 1) exit(EXIT_SUCCESS);
             if (selection < 0 || selection > deviceCount + 1)
             {
-                throw std::exception("invalid input");
+                throw std::runtime_error("invalid input");
             }
             else if (selection > 0)
             {
                 portName = availableDevices[selection - 1].portName;
             }
         }
-        catch (const std::exception& err)
+        catch (const std::runtime_error& err)
         {
             PRINT("Invalid selection, exiting...")
             (void)err; exit(EXIT_SUCCESS);

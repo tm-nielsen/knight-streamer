@@ -12,6 +12,7 @@
 # include <cmath>
 # include <signal.h>
 # include <stdarg.h>
+# include <stdexcept>
 
 #ifdef _WIN32
 #include <windows.h>

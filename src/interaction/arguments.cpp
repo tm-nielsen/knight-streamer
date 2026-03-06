@@ -55,7 +55,7 @@ CommandLineArguments ParseCommandLineArguments(int argc, char* argv[])
         ValidateCommandLineArguments(arguments);
         arguments.channelLabels = ParseChannelLabels(montageString);
     }
-    catch (const std::exception& err)
+    catch (const std::runtime_error& err)
     {
         PRINTERR(err.what());
         exit(EXIT_SUCCESS);
@@ -70,7 +70,7 @@ void ValidateCommandLineArguments(CommandLineArguments arguments)
 {
     if (!CommandLineArguments::validGainValues.count(arguments.gain))
     {
-        throw std::exception(
+        throw std::runtime_error(
             "Invalid gain value - allowed options: {1, 2, 3, 4, 6, 8, 12}"
         );
     }
@@ -91,7 +91,7 @@ std::vector<std::string> ParseChannelLabels(std::string montageString)
     std::vector<std::string> channelLabels = splitString(montageString);
     if (channelLabels.size() != CHANNEL_COUNT)
     {
-        throw std::exception(
+        throw std::runtime_error(
             std::format(
                 "Invalid montage - all {} channels must be labelled or disabled.",
                 CHANNEL_COUNT
@@ -103,5 +103,5 @@ std::vector<std::string> ParseChannelLabels(std::string montageString)
     {
         if (!channelLabels[i].empty()) return channelLabels;
     }
-    throw std::exception("All channels disabled, nothing to stream.");
+    throw std::runtime_error("All channels disabled, nothing to stream.");
 }
