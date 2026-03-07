@@ -108,6 +108,8 @@ void KnightBoardSerialInterface::ensureChannelConfiguration
     {
         COUT(commandDescription);
         writeSerialCommand(mPort, command);
+        mPort.flushWriteBuffers();
+        sleep(10);
         if (awaitChannelValue(channelIndex)) return;
         else
         {
