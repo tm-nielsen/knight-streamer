@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
     std::string portName = selectPort(arguments.serialPort);
 
     PRINT("---");
-    OUTF("Initializing Board Interface");
+    COUT("Initializing Board Interface");
     startWaitDisplay();
 
     KnightBoardSerialInterface boardInterface(
