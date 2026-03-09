@@ -21,7 +21,7 @@ add_executable(${PROJECT_NAME}
     src/neuropawn/knight_samples.cpp
     src/transmission/eeg_messenger.cpp
 )
-target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX)
+set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_WARNING_AS_ERROR ON)
 target_precompile_headers(${PROJECT_NAME} PRIVATE include/pch.hpp)
 target_include_directories(${PROJECT_NAME} PRIVATE include)
 
